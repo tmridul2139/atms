@@ -3,421 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Attendance Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            background-color: #3498db;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            margin-bottom: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .search-section {
-            background-color: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-        
-        .search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        
-        button {
-            padding: 12px 20px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        button:hover {
-            background-color: #2980b9;
-        }
-        
-        #error-message {
-            color: #e74c3c;
-            margin-top: 10px;
-            font-weight: bold;
-            display: none;
-        }
-        
-        #loading {
-            text-align: center;
-            display: none;
-            margin: 20px 0;
-        }
-        
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .result-section {
-            display: none;
-            background-color: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .student-info {
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .student-info h2 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-        }
-        
-        .student-info p {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        
-        .attendance-summary {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .summary-card {
-            flex: 1;
-            min-width: 200px;
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            text-align: center;
-        }
-        
-        .summary-card h3 {
-            font-size: 16px;
-            color: #7f8c8d;
-            margin-bottom: 10px;
-        }
-        
-        .summary-card p {
-            font-size: 32px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        
-        .summary-card.warning p {
-            color: #e74c3c;
-        }
-        
-        .summary-card.success p {
-            color: #27ae60;
-        }
-        
-        .attendance-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        
-        .attendance-table th, .attendance-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .attendance-table th {
-            background-color: #f8f9fa;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        
-        .attendance-table tr:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .status {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        
-        .status-present {
-            background-color: #e8f5e9;
-            color: #27ae60;
-        }
-        
-        .status-absent {
-            background-color: #ffebee;
-            color: #e74c3c;
-        }
-        
-        .footer {
-            margin-top: 50px;
-            text-align: center;
-            color: #7f8c8d;
-            font-size: 14px;
-        }
-        
-        @media (max-width: 768px) {
-            .attendance-summary {
-                flex-direction: column;
-            }
-            
-            .summary-card {
-                min-width: 100%;
-            }
-            
-            .search-box {
-                flex-direction: column;
-            }
-            
-            .attendance-table {
-                font-size: 14px;
-            }
-            
-            .attendance-table th, .attendance-table td {
-                padding: 8px 10px;
-            }
-        }
-    </style>
+    <title>DeepVision Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Student Attendance Dashboard</h1>
-            <p>Check your attendance status across all subjects</p>
-        </header>
+    <!-- Landing Page -->
+    <div class="landing-page" id="landingPage">
+        <h1 class="hero-title">DeepVision</h1>
+        <h2 class="hero-subtitle">AI-Powered Presence Tracking</h2>
+        <p class="hero-description">
+            A college-level IoT prototype for smart attendance management using AI and sensor integration.
+            DeepVision provides automated tracking of student presence in classrooms, minimizing manual errors and improving academic transparency.
+        </p>
         
-        <section class="search-section">
-            <h2>Enter Your Enrollment Number</h2>
-            <div class="search-box">
-                <input type="text" id="enrollment-input" placeholder="Enter your enrollment number (e.g., 52)">
-                <button id="search-btn">Check Attendance</button>
-            </div>
-            <div id="error-message">Invalid enrollment number. Please try again.</div>
-        </section>
-        
-        <div id="loading">
-            <div class="loader"></div>
-            <p>Loading attendance data...</p>
+        <div class="button-container">
+            <button class="primary-btn" onclick="showDashboard()">
+                Launch Prototype →
+            </button>
+            <a href="#" class="secondary-btn">Project Overview</a>
         </div>
         
-        <section id="result-section" class="result-section">
-            <div class="student-info">
-                <h2 id="student-name">Student Name</h2>
-                <p>Enrollment Number: <span id="enrollment-number">-</span></p>
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number">1st</div>
+                <div class="stat-label">Prototype Version</div>
             </div>
-            
-            <h2>Attendance Summary</h2>
-            <div class="attendance-summary">
-                <div class="summary-card">
-                    <h3>Total Classes</h3>
-                    <p id="total-classes">-</p>
-                </div>
-                <div class="summary-card">
-                    <h3>Current Attendance</h3>
-                    <p id="current-attendance">-</p>
-                </div>
-                <div class="summary-card">
-                    <h3>Required (75%)</h3>
-                    <p id="required-attendance">-</p>
-                </div>
-                <div class="summary-card">
-                    <h3>Can Skip</h3>
-                    <p id="can-skip">-</p>
-                </div>
+            <div class="stat-card">
+                <div class="stat-number">IIoT</div>
+                <div class="stat-label">Real-time Data Integration</div>
             </div>
-            
-            <h2>Attendance Records</h2>
-            <div class="table-container">
-                <table class="attendance-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="attendance-records">
-                        <!-- Attendance records will be inserted here -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+        </div>
+    </div>
+    
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboardPage">
+        <div class="back-btn" onclick="showLandingPage()">
+            ← Back to Home
+        </div>
         
-        <div class="footer">
-            <p>© 2025 Student Attendance System</p>
+        <div class="container">
+            <h2>Attendance Dashboard</h2>
+            <div class="course-tabs" id="courseTabs"></div>
+            <div class="search-container">
+                <input type="text" id="searchBox" placeholder="Enter Enrollment Number">
+                <button class="btn" onclick="searchByEnrollment()">
+                    Search
+                </button>
+            </div>
+
+            <div id="tablesContainer"></div>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchBtn = document.getElementById('search-btn');
-            const enrollmentInput = document.getElementById('enrollment-input');
-            const errorMessage = document.getElementById('error-message');
-            const loadingIndicator = document.getElementById('loading');
-            const resultSection = document.getElementById('result-section');
-            
-            // Elements to populate with data
-            const studentNameEl = document.getElementById('student-name');
-            const enrollmentNumberEl = document.getElementById('enrollment-number');
-            const totalClassesEl = document.getElementById('total-classes');
-            const currentAttendanceEl = document.getElementById('current-attendance');
-            const requiredAttendanceEl = document.getElementById('required-attendance');
-            const canSkipEl = document.getElementById('can-skip');
-            const attendanceRecordsEl = document.getElementById('attendance-records');
-            
-            // API URL - Replace with your deployed web app URL
-            const API_URL = 'https://script.google.com/macros/s/AKfycbxrKiu7omvZpK2tR96PMWJ6wl36QchDRNpXUlp2YuEjAvXvm56ynUpdPhrEUuW6Notb/exec ';
-            
-            searchBtn.addEventListener('click', fetchAttendanceData);
-            enrollmentInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    fetchAttendanceData();
-                }
-            });
-            
-            function fetchAttendanceData() {
-                const enrollmentNumber = enrollmentInput.value.trim();
-                
-                if (!enrollmentNumber) {
-                    showError('Please enter an enrollment number');
-                    return;
-                }
-                
-                // Show loading, hide error and results
-                errorMessage.style.display = 'none';
-                resultSection.style.display = 'none';
-                loadingIndicator.style.display = 'block';
-                
-                // Fetch data from the API
-                fetch(`${API_URL}?enrollNo=${enrollmentNumber}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.error) {
-                            showError(data.error);
-                            loadingIndicator.style.display = 'none';
-                            return;
-                        }
-                        
-                        displayAttendanceData(data);
-                        loadingIndicator.style.display = 'none';
-                        resultSection.style.display = 'block';
-                    })
-                    .catch(error => {
-                        console.error('Error fetching attendance data:', error);
-                        showError('Failed to fetch attendance data. Please try again later.');
-                        loadingIndicator.style.display = 'none';
-                    });
-            }
-            
-            function displayAttendanceData(data) {
-                // Populate student info
-                studentNameEl.textContent = data.name;
-                enrollmentNumberEl.textContent = data.enrollNo;
-                
-                // Populate summary cards
-                totalClassesEl.textContent = data.totalClasses;
-                currentAttendanceEl.textContent = `${data.currentAttendance}%`;
-                requiredAttendanceEl.textContent = data.requiredAttendance;
-                canSkipEl.textContent = data.canSkip;
-                
-                // Style the current attendance card based on status
-                const currentAttendanceCard = currentAttendanceEl.parentElement;
-                if (parseInt(data.currentAttendance) < 75) {
-                    currentAttendanceCard.classList.add('warning');
-                    currentAttendanceCard.classList.remove('success');
-                } else {
-                    currentAttendanceCard.classList.add('success');
-                    currentAttendanceCard.classList.remove('warning');
-                }
-                
-                // Clear previous records
-                attendanceRecordsEl.innerHTML = '';
-                
-                // Add attendance records
-                data.attendanceRecords.forEach(record => {
-                    const row = document.createElement('tr');
-                    
-                    const dateCell = document.createElement('td');
-                    dateCell.textContent = record.date;
-                    row.appendChild(dateCell);
-                    
-                    const statusCell = document.createElement('td');
-                    const statusSpan = document.createElement('span');
-                    statusSpan.textContent = record.status === 'P' ? 'Present' : 'Absent';
-                    statusSpan.classList.add('status');
-                    statusSpan.classList.add(record.status === 'P' ? 'status-present' : 'status-absent');
-                    statusCell.appendChild(statusSpan);
-                    row.appendChild(statusCell);
-                    
-                    attendanceRecordsEl.appendChild(row);
-                });
-            }
-            
-            function showError(message) {
-                errorMessage.textContent = message;
-                errorMessage.style.display = 'block';
-            }
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
