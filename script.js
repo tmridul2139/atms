@@ -1,15 +1,17 @@
 let isFetching = false;
 let currentCourse = null;
+let allFilteredData = [];
+
 const courses = [
     { label: "All Subjects", value: "ALL" },
     { label: "IOT", value: "IOT" },
-    { label: "DS", value: "DS" }
+    { label: "Oops With Java", value: "Java" }
 ];
 
 function showDashboard() {
     document.getElementById("landingPage").style.display = "none";
     document.getElementById("dashboardPage").style.display = "block";
-    
+
     if (!currentCourse) {
         initializeCourseTabs();
     }
@@ -40,11 +42,13 @@ function initializeCourseTabs() {
     currentCourse = courses[0].value;
 }
 
-async function searchByEnrollment() {
-    if (!currentCourse) return;
-
+async function searchByBatch() {
     const tablesContainer = document.getElementById("tablesContainer");
     tablesContainer.innerHTML = "";
+    document.getElementById("enrollSearchContainer").style.display = "none";
+    allFilteredData = [];
+
+    const batch = document.getElementById("batchSelector").value;
 
     const loadingDiv = document.createElement("div");
     loadingDiv.style.textAlign = "center";
@@ -54,51 +58,54 @@ async function searchByEnrollment() {
     tablesContainer.appendChild(loadingDiv);
 
     if (currentCourse === "ALL") {
-        try {
-            for (let course of courses.slice(1)) {
-                await fetchAttendance(course.value);
-            }
-        } catch (error) {
-            console.error("Error fetching all subjects:", error);
-            alert("An error occurred while fetching data for all subjects.");
+        for (let course of courses.slice(1)) {
+            await fetchAttendance(course.value, batch);
         }
     } else {
-        await fetchAttendance(currentCourse);
+        await fetchAttendance(currentCourse, batch);
     }
 
     loadingDiv.remove();
+    if (allFilteredData.length > 0) {
+        document.getElementById("enrollSearchContainer").style.display = "flex";
+    }
 }
 
-async function fetchAttendance(course) {
+function getBatchRange(batch) {
+    if (batch === "B1") {
+        const baseRange = Array.from({ length: 65 }, (_, i) => i + 1); // 1 to 65
+        const extras = [604, 607, 610, 611, 612]; // additional roll numbers
+        return [...baseRange, ...extras];
+    }
+    if (batch === "B2") {
+        const baseRange = Array.from({ length: 137 }, (_, i) => i + 66); // 1 to 65
+        const extras = [601, 602, 603, 605, 606,608,609]; // additional roll numbers
+        return [...baseRange, ...extras];
+    }
+    return Array.from({ length: 999 }, (_, i) => i + 1); // default all
+}
+
+async function fetchAttendance(course, batch) {
     if (isFetching) return;
 
     isFetching = true;
     const tablesContainer = document.getElementById("tablesContainer");
+    const rollList = getBatchRange(batch); // updated logic
 
     try {
-        const searchValue = document.getElementById("searchBox").value.trim().toLowerCase();
-
         const response = await fetch(`https://script.google.com/macros/s/AKfycbwgHq6afWZdxx_TP3OPEOHspCt0udn1jayl_XZn-T4oVmvg8YxeOkrWJkIesqVxZxzV/exec?sheet=${course}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
         const { headers, data, error } = await response.json();
 
         if (error) throw new Error(error);
-        if (!Array.isArray(data) || !Array.isArray(headers)) throw new Error("Invalid data format received from server");
 
         const filteredData = data.filter(row => {
-            if (!row || !Array.isArray(row)) return false;
-            const name = row[0]?.toString().trim();
-            const enrollmentNumber = row[1]?.toString().toLowerCase() || '';
-            return name && enrollmentNumber && (!searchValue || enrollmentNumber.includes(searchValue));
+            const enroll = parseInt(row[1]);
+            return !isNaN(enroll) && rollList.includes(enroll);
         });
 
+        allFilteredData.push({ course, headers, data: filteredData });
         if (filteredData.length > 0) {
             createFilteredTable(course, headers, filteredData, tablesContainer);
-        } else if (currentCourse !== "ALL") {
-            alert(`No matching records found for ${course}.`);
         }
     } catch (error) {
         console.error(`Error fetching data for ${course}:`, error);
@@ -106,6 +113,48 @@ async function fetchAttendance(course) {
     } finally {
         isFetching = false;
     }
+}
+
+document.getElementById("searchBox").addEventListener("input", filterByEnrollment);
+
+function filterByEnrollment() {
+    const input = document.getElementById("searchBox").value.trim().toLowerCase();
+    const tablesContainer = document.getElementById("tablesContainer");
+    tablesContainer.innerHTML = "";
+
+    let targets = [];
+
+    if (input.includes(",")) {
+        targets = input.split(",").map(v => parseInt(v.trim())).filter(n => !isNaN(n));
+    } else if (input.includes("-")) {
+        const parts = input.split("-").map(p => parseInt(p.trim()));
+        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+            for (let i = parts[0]; i <= parts[1]; i++) targets.push(i);
+        }
+    } else {
+        const val = parseInt(input);
+        if (!isNaN(val)) {
+            targets.push(val);
+        }
+    }
+
+    if (targets.length === 0) {
+        allFilteredData.forEach(({ course, headers, data }) => {
+            createFilteredTable(course, headers, data, tablesContainer);
+        });
+        return;
+    }
+
+    allFilteredData.forEach(({ course, headers, data }) => {
+        const filtered = data.filter(row => {
+            const enroll = parseInt(row[1]);
+            return targets.includes(enroll);
+        });
+
+        if (filtered.length > 0) {
+            createFilteredTable(course, headers, filtered, tablesContainer);
+        }
+    });
 }
 
 function createFilteredTable(title, headers, data, container) {
@@ -117,10 +166,9 @@ function createFilteredTable(title, headers, data, container) {
 
     const subjectLabel = document.createElement("div");
     subjectLabel.className = "subject-label";
-    subjectLabel.innerHTML = `<strong>${title}</strong>`;
+    subjectLabel.innerHTML = `<strong>${title}</strong> <small>(${getProfessorName(title)})</small>`;
     container.appendChild(subjectLabel);
 
-    // ✅ Find the valid row with proper required & canSkip values
     let validRow = null;
     const requiredIndex = headers.length - 2;
     const canSkipIndex = headers.length - 1;
@@ -134,10 +182,7 @@ function createFilteredTable(title, headers, data, container) {
         }
     }
 
-    let totalHeld = 0;
-    let required = 0;
-    let canSkip = 0;
-    let totalLectures = 0;
+    let totalHeld = 0, required = 0, canSkip = 0, totalLectures = 0;
 
     if (validRow) {
         required = parseInt(validRow[requiredIndex]) || 0;
@@ -159,11 +204,10 @@ function createFilteredTable(title, headers, data, container) {
     `;
     container.appendChild(lectureInfo);
 
-    // Create the actual table
     const table = document.createElement("table");
     table.className = "subject-table";
-    const tableHead = document.createElement("thead");
-    const tableBody = document.createElement("tbody");
+    const thead = document.createElement("thead");
+    const tbody = document.createElement("tbody");
 
     const headerRow = document.createElement("tr");
     filteredHeaders.forEach(header => {
@@ -171,28 +215,32 @@ function createFilteredTable(title, headers, data, container) {
         th.innerText = header;
         headerRow.appendChild(th);
     });
-    tableHead.appendChild(headerRow);
-    table.appendChild(tableHead);
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
 
     data.forEach(row => {
         const tr = document.createElement("tr");
-        row.forEach((cell, colIndex) => {
-            if (nonEmptyColumns[colIndex]) {
+        row.forEach((cell, index) => {
+            if (nonEmptyColumns[index]) {
                 const td = document.createElement("td");
                 td.innerText = cell || "-";
                 tr.appendChild(td);
             }
         });
-        tableBody.appendChild(tr);
+        tbody.appendChild(tr);
     });
 
-    table.appendChild(tableBody);
+    table.appendChild(tbody);
     container.appendChild(table);
 }
 
-
-
-
+function getProfessorName(subject) {
+    const professors = {
+        "IOT": "Dr. Khyati Chopra",
+        "Java": "Dr. Neeta Singh"
+    };
+    return professors[subject] || "Faculty";
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     showLandingPage();
