@@ -310,6 +310,47 @@ tr:hover {
 
 .lecture-info {
     margin-bottom: 15px;
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: var(--text-dark);
+}
+.batch-selector-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+    font-size: 16px;
+}
+
+.batch-selector-container label {
+    color: var(--text-light); /* adjust depending on your theme */
+    font-weight: 500;
+}
+
+.batch-dropdown {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #1f1f1f; /* match your dark background */
+    color: white;
+    font-size: 15px;
+    outline: none;
+}
+
+.batch-dropdown:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
+}
+
+.batch-search-btn {
+    padding: 8px 16px;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.batch-search-btn:hover {
+    background-color: #0056b3;
 }
