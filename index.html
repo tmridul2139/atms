@@ -15,14 +15,14 @@
             A college-level IoT prototype for smart attendance management using AI and sensor integration.
             DeepVision provides automated tracking of student presence in classrooms, minimizing manual errors and improving academic transparency.
         </p>
-        
+
         <div class="button-container">
             <button class="primary-btn" onclick="showDashboard()">
                 Launch Prototype →
             </button>
             <a href="#" class="secondary-btn">Project Overview</a>
         </div>
-        
+
         <div class="stats-container">
             <div class="stat-card">
                 <div class="stat-number">1st</div>
@@ -34,22 +34,32 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Dashboard -->
     <div class="dashboard" id="dashboardPage">
         <div class="back-btn" onclick="showLandingPage()">
             ← Back to Home
         </div>
-        
+
         <div class="container">
             <h2>Attendance Dashboard</h2>
             <div class="course-tabs" id="courseTabs"></div>
-            <div class="search-container">
-                <input type="text" id="searchBox" placeholder="Enter Enrollment Number">
-                <button class="btn" onclick="searchByEnrollment()">
-                    Search
-                </button>
+
+            <div class="search-container batch-selector-container">
+                <label for="batchSelector">Batch:</label>
+                <select id="batchSelector" class="batch-dropdown">
+                    <option value="ALL">All</option>
+                    <option value="B1">B1</option>
+                    <option value="B2">B2</option>
+                </select>
+                <button class="btn batch-search-btn" onclick="searchByBatch()">Search</button>
             </div>
+            
+
+            <div class="search-container" id="enrollSearchContainer" style="display: none; margin-top: 10px;">
+                <input type="text" id="searchBox" placeholder="Enter Enrollment Number">
+            </div>
+            
 
             <div id="tablesContainer"></div>
         </div>
