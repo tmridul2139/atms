@@ -15,6 +15,9 @@ function showDashboard() {
     if (!currentCourse) {
         initializeCourseTabs();
     }
+    
+    // Automatically load data when dashboard is shown
+    searchByBatch();
 }
 
 function showLandingPage() {
@@ -34,6 +37,8 @@ function initializeCourseTabs() {
             document.querySelectorAll(".course-tab").forEach(t => t.classList.remove("active"));
             tab.classList.add("active");
             currentCourse = course.value;
+            // Auto-refresh data when course tab changes
+            searchByBatch();
         };
         courseTabs.appendChild(tab);
     });
@@ -78,8 +83,8 @@ function getBatchRange(batch) {
         return [...baseRange, ...extras];
     }
     if (batch === "B2") {
-        const baseRange = Array.from({ length: 137 }, (_, i) => i + 66); // 1 to 65
-        const extras = [601, 602, 603, 605, 606,608,609]; // additional roll numbers
+        const baseRange = Array.from({ length: 137 }, (_, i) => i + 66); // 66 to 202
+        const extras = [601, 602, 603, 605, 606, 608, 609]; // additional roll numbers
         return [...baseRange, ...extras];
     }
     return Array.from({ length: 999 }, (_, i) => i + 1); // default all
@@ -170,8 +175,25 @@ function createFilteredTable(title, headers, data, container) {
     container.appendChild(subjectLabel);
 
     let validRow = null;
-    const requiredIndex = headers.length - 2;
-    const canSkipIndex = headers.length - 1;
+    // Find the indices for required and can skip columns
+    let requiredIndex = -1;
+    let canSkipIndex = -1;
+    let midSemIndex = -1;
+    let internalIndex = -1;
+    
+    // Look for specific column headers
+    headers.forEach((header, index) => {
+        if (header.includes("Required")) requiredIndex = index;
+        if (header.includes("Skip")) canSkipIndex = index;
+        if (header.includes("MID") || header.includes("SEM")) midSemIndex = index;
+        if (header.includes("INTERNAL")) internalIndex = index;
+    });
+    
+    // If not found by name, use positions from end
+    if (requiredIndex === -1) requiredIndex = headers.length - 4; // 4th from last
+    if (canSkipIndex === -1) canSkipIndex = headers.length - 3; // 3rd from last
+    if (midSemIndex === -1) midSemIndex = headers.length - 2; // 2nd from last
+    if (internalIndex === -1) internalIndex = headers.length - 1; // Last column
 
     for (let row of data) {
         const req = parseInt(row[requiredIndex]);
@@ -188,11 +210,17 @@ function createFilteredTable(title, headers, data, container) {
         required = parseInt(validRow[requiredIndex]) || 0;
         canSkip = parseInt(validRow[canSkipIndex]) || 0;
 
+        // Count attendance columns (P or A) before the required column
+        // but make sure to skip the first two columns (Name and Enrollment)
         for (let i = 2; i < requiredIndex; i++) {
+            // Skip MID SEM and INTERNAL columns
+            if (i === midSemIndex || i === internalIndex) continue;
+            
             const val = (validRow[i] || "").toString().trim().toUpperCase();
             if (val === "P" || val === "A") totalHeld++;
         }
 
+        // Total lectures is the sum of lectures held + required + can skip
         totalLectures = totalHeld + required + canSkip;
     }
 
@@ -244,4 +272,11 @@ function getProfessorName(subject) {
 
 document.addEventListener("DOMContentLoaded", () => {
     showLandingPage();
+    
+    // Add event listener to batch selector for auto-refresh
+    document.getElementById("batchSelector").addEventListener("change", function() {
+        if (document.getElementById("dashboardPage").style.display === "block") {
+            searchByBatch();
+        }
+    });
 });
