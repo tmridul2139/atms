@@ -20,7 +20,7 @@ function showLoginModal() {
     modal.className = 'login-modal';
     modal.innerHTML = `
         <div class="login-container">
-            <h2>Admin Login</h2>
+            <h2>Professor Login</h2>
             <input type="text" id="username" placeholder="Username" />
             <input type="password" id="password" placeholder="Password" />
             <button onclick="handleLogin()">Login</button>
