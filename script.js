@@ -1,12 +1,68 @@
 let isFetching = false;
 let currentCourse = null;
 let allFilteredData = [];
+let isAdmin = false;
 
 const courses = [
     { label: "All Subjects", value: "ALL" },
     { label: "IOT", value: "IOT" },
     { label: "Oops With Java", value: "Java" }
 ];
+
+// Admin credentials
+const ADMIN_CREDENTIALS = {
+    username: "khyati",
+    password: "iot2023"
+};
+
+function showLoginModal() {
+    const modal = document.createElement('div');
+    modal.className = 'login-modal';
+    modal.innerHTML = `
+        <div class="login-container">
+            <h2>Admin Login</h2>
+            <input type="text" id="username" placeholder="Username" />
+            <input type="password" id="password" placeholder="Password" />
+            <button onclick="handleLogin()">Login</button>
+            <button onclick="closeLoginModal()">Cancel</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Add keypress event listeners for enter key
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+
+    const handleEnterKey = (e) => {
+        if (e.key === 'Enter') {
+            handleLogin();
+        }
+    };
+
+    usernameInput.addEventListener('keypress', handleEnterKey);
+    passwordInput.addEventListener('keypress', handleEnterKey);
+}
+
+function closeLoginModal() {
+    const modal = document.querySelector('.login-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function handleLogin() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+        isAdmin = true;
+        closeLoginModal();
+        // Redirect to Google Sheets link in new tab
+        window.open('https://docs.google.com/spreadsheets/d/1LegdfXAVFG6bhUiSjGhZNHQk5IGToehCUIyEr_O6wwA/edit?gid=1013258918#gid=1013258918', '_blank');
+    } else {
+        alert('Invalid credentials');
+    }
+}
 
 function showDashboard() {
     document.getElementById("landingPage").style.display = "none";
@@ -279,4 +335,12 @@ document.addEventListener("DOMContentLoaded", () => {
             searchByBatch();
         }
     });
+
+    // Add admin login button to landing page
+    const buttonContainer = document.querySelector('.button-container');
+    const adminBtn = document.createElement('button');
+    adminBtn.className = 'secondary-btn';
+    adminBtn.textContent = 'Professor Login';
+    adminBtn.onclick = showLoginModal;
+    buttonContainer.appendChild(adminBtn);
 });
